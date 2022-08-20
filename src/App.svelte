@@ -34,7 +34,7 @@
 
         setTimeout(() => {
           isLoading = false;
-          meetupsStore.setMeetups(loadedMeetups);
+          meetupsStore.setMeetups(loadedMeetups.reverse());
         }, 1000);
       })
       .catch(err => {
