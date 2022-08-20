@@ -15,6 +15,19 @@
   export let isFav;
 
   function toggleFavorite() {
+    fetch(`https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups/${id}.json`, {
+      method: 'PATCH',
+	    body: JSON.stringify({isFavorite: !isFav}),
+      headers: {'Content-Type': 'application/json'}
+    })
+	    .then(res => {
+				if (!res.ok) {
+          throw new Error('Error while toggling is favorite!')
+				}
+	    })
+	    .catch(err => {
+        console.log({err})
+	    })
     meetupsStore.toggleFavorite(id)
   }
 </script>

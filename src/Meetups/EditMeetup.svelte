@@ -49,7 +49,20 @@
       contactEmail: email
     }
     if (id) {
-      meetupsStore.updateMeetup(id, meetupData);
+      fetch(`https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups/${id}.json`, {
+        method: 'PATCH', //using patch to not replace the whole object, but just info we send
+        body: JSON.stringify(meetupData),
+        headers: {'Content-Type': 'application/json'}
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Failed to update data')
+          }
+          meetupsStore.updateMeetup(id, meetupData);
+        })
+        .catch(err => {
+          console.log({err})
+        })
     } else {
       fetch('https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups.json', {
         method: 'POST',
@@ -62,9 +75,9 @@
           }
           return res.json();
         })
-	      .then(data => {
-					meetupsStore.addMeetup({...meetupData, isFavorite: false, id: data.name})
-	      })
+        .then(data => {
+          meetupsStore.addMeetup({...meetupData, isFavorite: false, id: data.name})
+        })
         .catch(err => {
           console.log(err)
         });
