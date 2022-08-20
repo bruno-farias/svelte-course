@@ -81,7 +81,6 @@
         .catch(err => {
           console.log(err)
         });
-      meetupsStore.addMeetup(meetupData);
     }
     dispatch('save')
   }
@@ -91,7 +90,19 @@
   }
 
   function deleteMeetup() {
-    meetupsStore.deleteMeetup(id)
+    fetch(`https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups/${id}.json`, {
+      method: 'DELETE'
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Error while deleting meetup');
+        }
+        meetupsStore.deleteMeetup(id)
+      })
+      .catch(err => {
+        console.log({err})
+      })
+
     dispatch('save')
   }
 
