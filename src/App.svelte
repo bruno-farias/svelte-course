@@ -6,6 +6,7 @@
   import EditMeetup from "./Meetups/EditMeetup.svelte";
   import MeetupDetail from "./Meetups/MeetupDetail.svelte";
   import Loading from "./UI/Loading.svelte";
+  import Error from "./UI/Error.svelte";
 
   let meetups = meetupsStore;
   let editMode = null;
@@ -13,6 +14,7 @@
   let page = 'overview';
   let pageData = {};
   let isLoading = false;
+  let error;
 
   onMount(() => {
     isLoading = true;
@@ -39,7 +41,7 @@
       })
       .catch(err => {
         isLoading = false;
-        console.log(err.message)
+        error = err;
       })
   })
 
@@ -67,6 +69,10 @@
     editMode = 'edit';
     editedId = event.detail;
   }
+
+  function clearError() {
+	  error = null;
+  }
 </script>
 
 <style>
@@ -74,6 +80,10 @@
         margin-top: 5rem;
     }
 </style>
+
+{#if error}
+	<Error message={error.message} on:cancel={clearError}/>
+{/if}
 
 <Header/>
 
