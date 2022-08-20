@@ -5,14 +5,17 @@
   import MeetupGrid from "./Meetups/MeetupGrid.svelte";
   import EditMeetup from "./Meetups/EditMeetup.svelte";
   import MeetupDetail from "./Meetups/MeetupDetail.svelte";
+  import Loading from "./UI/Loading.svelte";
 
   let meetups = meetupsStore;
   let editMode = null;
   let editedId = null;
   let page = 'overview';
   let pageData = {};
+  let isLoading = false;
 
   onMount(() => {
+    isLoading = true;
     fetch('https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups.json')
       .then(res => {
         if (!res.ok) {
@@ -28,9 +31,14 @@
             id: key
           });
         }
-			meetupsStore.setMeetups(loadedMeetups);
+
+        setTimeout(() => {
+          isLoading = false;
+          meetupsStore.setMeetups(loadedMeetups);
+        }, 1000);
       })
       .catch(err => {
+        isLoading = false;
         console.log(err.message)
       })
   })
@@ -74,7 +82,15 @@
 		{#if editMode === 'edit'}
 			<EditMeetup id={editedId} on:save={saveMeetup} on:cancel={cancelEdit}/>
 		{/if}
-		<MeetupGrid meetups={$meetups} on:showdetails={showDetails} on:edit={startEdit} on:add={() => {editMode = 'edit'}}/>
+		{#if isLoading}
+			<Loading/>
+		{:else }
+			<MeetupGrid
+					meetups={$meetups}
+					on:showdetails={showDetails}
+					on:edit={startEdit}
+					on:add={() => {editMode = 'edit'}}/>
+		{/if}
 	{:else}
 		<MeetupDetail id={pageData.id} on:close={closeDetails}/>
 	{/if}
