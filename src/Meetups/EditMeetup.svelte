@@ -51,6 +51,23 @@
     if (id) {
       meetupsStore.updateMeetup(id, meetupData);
     } else {
+      fetch('https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups.json', {
+        method: 'POST',
+        body: JSON.stringify({...meetupData, isFavorite: false}),
+        headers: {'Content-Type': 'application/json'}
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Failed to save new meetup!')
+          }
+          return res.json();
+        })
+	      .then(data => {
+					meetupsStore.addMeetup({...meetupData, isFavorite: false, id: data.name})
+	      })
+        .catch(err => {
+          console.log(err)
+        });
       meetupsStore.addMeetup(meetupData);
     }
     dispatch('save')
@@ -61,8 +78,8 @@
   }
 
   function deleteMeetup() {
-	  meetupsStore.deleteMeetup(id)
-	  dispatch('save')
+    meetupsStore.deleteMeetup(id)
+    dispatch('save')
   }
 
 </script>

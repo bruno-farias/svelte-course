@@ -1,9 +1,9 @@
 <script>
+  import {onMount} from 'svelte';
   import meetupsStore from "./Meetups/meetups-store.js";
   import Header from "./UI/Header.svelte";
   import MeetupGrid from "./Meetups/MeetupGrid.svelte";
   import EditMeetup from "./Meetups/EditMeetup.svelte";
-  import Button from "./UI/Button.svelte";
   import MeetupDetail from "./Meetups/MeetupDetail.svelte";
 
   let meetups = meetupsStore;
@@ -11,6 +11,29 @@
   let editedId = null;
   let page = 'overview';
   let pageData = {};
+
+  onMount(() => {
+    fetch('https://svelte-course-7fc33-default-rtdb.europe-west1.firebasedatabase.app/meetups.json')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Error while fetching data!')
+        }
+        return res.json();
+      })
+      .then(data => {
+        const loadedMeetups = [];
+        for (const key in data) {
+          loadedMeetups.push({
+            ...data[key],
+            id: key
+          });
+        }
+			meetupsStore.setMeetups(loadedMeetups);
+      })
+      .catch(err => {
+        console.log(err.message)
+      })
+  })
 
   function saveMeetup() {
     editMode = null;
@@ -26,13 +49,15 @@
     page = 'details';
     pageData.id = event.detail;
   }
+
   function closeDetails() {
-	  page = 'overview';
+    page = 'overview';
     pageData = {};
   }
+
   function startEdit(event) {
-	  editMode = 'edit';
-		editedId = event.detail;
+    editMode = 'edit';
+    editedId = event.detail;
   }
 </script>
 
